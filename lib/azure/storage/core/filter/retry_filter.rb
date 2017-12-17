@@ -33,7 +33,10 @@ module Azure::Storage::Core::Filter
       @retry_interval = retry_interval
       @request_options = {}
 
-      super &:should_retry?
+      options = {}
+      options[:retry_exceptions] = [::StandardError, ::Errno::ETIMEDOUT]
+      options[:retry_exceptions] << ::Timeout::Error if defined?(::Timeout::Error)
+      super(options, &:should_retry?)
     end
 
     attr_reader :retry_count,
